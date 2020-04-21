@@ -1,16 +1,15 @@
 pipeline {
    agent any
    environment {
-       registry = "docker-repo"
+       registry = "nexus.local.net:8123"
        GOCACHE = "/tmp"
    }
    stages {
        stage('Build') {
            agent {
-           kubernetes {
-               'go'
-               defaultContainer 'golang'
-           }
+               docker {
+                   image 'golang'
+               }
            }
            steps {
                // Create our project directory.
@@ -24,10 +23,9 @@ pipeline {
        }
        stage('Test') {
            agent {
-           kubernetes {
-               'go'
-        defaultContainer 'golang'
-           }
+               docker {
+                   image 'golang'
+               }
            }
            steps {
                // Create our project directory.
@@ -41,9 +39,9 @@ pipeline {
                sh 'go test ./... -v -short'
            }
        }
-       /*stage('Publish') {
+       stage('Publish') {
            environment {
-               registryCredential = 'dockerhub'
+               registryCredential = 'docker-repo'
            }
            steps{
                script {
@@ -62,6 +60,6 @@ pipeline {
                    sh "ansible-playbook  playbook.yml --extra-vars \"image_id=${image_id}\""
                }
            }
-       }*/
+       }
    }
 }
