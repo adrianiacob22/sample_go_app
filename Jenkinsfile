@@ -21,6 +21,10 @@ pipeline {
             value: jnlp
         - name: golang
           image: golang
+          command:
+          - sleep
+          args:
+          - infinity
         imagePullSecrets:
         - name: docker-repo
         '''
@@ -52,6 +56,10 @@ pipeline {
             value: jnlp
         - name: golang
           image: golang
+          command:
+          - sleep
+          args:
+          - infinity
         imagePullSecrets:
         - name: docker-repo
         '''
