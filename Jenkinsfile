@@ -21,6 +21,8 @@ imagePullSecrets:
       container('golang'){
         sh "echo Building"
       }
+      }
+      pipeline {
       environment {
           registry = "docker-repo"
           GOCACHE = "/tmp"
