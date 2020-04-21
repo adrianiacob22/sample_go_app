@@ -1,42 +1,29 @@
 pipeline {
-   agent {
-   kubernetes {
-       // Rather than inline YAML, in a multibranch Pipeline you could use: yamlFile 'jenkins-pod.yaml'
-       // Or, to avoid YAML:
-       // containerTemplate {
-       //     name 'shell'
-       //     image 'ubuntu'
-       //     command 'sleep'
-       //     args 'infinity'
-       // }
-       yaml '''
-apiVersion: v1
-kind: Pod
-spec:
-containers:
-- name: shell
-image: ubuntu
-command:
-- sleep
-args:
-- 50
-'''
-       // Can also wrap individual steps:
-       // container('shell') {
-       //     sh 'hostname'
-       // }
-       defaultContainer 'shell'
-   }
-   }
+   agent any
    environment {
-         GOCACHE = "/tmp"
+       registry = "magalixcorp/k8scicd"
+       GOCACHE = "/tmp"
    }
    stages {
        stage('Build') {
            agent {
-               docker {
-                   image 'golang'
-               }
+           kubernetes {
+               yaml '''
+        apiVersion: v1
+        kind: Pod
+        spec:
+        containers:
+        - name: jnlp
+          image: nexus.local.net:8123/jenkins-jnlp-slave:20200420
+          env:
+          - name: CONTAINER_ENV_VAR
+            value: jnlp
+        - name: golang
+          image: golang
+        imagePullSecrets:
+        - name: docker-repo
+        '''
+           }
            }
            steps {
                // Create our project directory.
@@ -46,14 +33,27 @@ args:
                sh 'cp -r ${WORKSPACE}/* ${GOPATH}/src/hello-world'
                // Build the app.
                sh 'go build'
-               sh 'hostname'
            }
        }
        stage('Test') {
            agent {
-               docker {
-                   image 'golang'
-               }
+           kubernetes {
+               yaml '''
+        apiVersion: v1
+        kind: Pod
+        spec:
+        containers:
+        - name: jnlp
+          image: nexus.local.net:8123/jenkins-jnlp-slave:20200420
+          env:
+          - name: CONTAINER_ENV_VAR
+            value: jnlp
+        - name: golang
+          image: golang
+        imagePullSecrets:
+        - name: docker-repo
+        '''
+           }
            }
            steps {
                // Create our project directory.
@@ -67,6 +67,27 @@ args:
                sh 'go test ./... -v -short'
            }
        }
-
+       stage('Publish') {
+           environment {
+               registryCredential = 'dockerhub'
+           }
+           steps{
+               script {
+                   def appimage = docker.build registry + ":$BUILD_NUMBER"
+                   docker.withRegistry( '', registryCredential ) {
+                       appimage.push()
+                       appimage.push('latest')
+                   }
+               }
+           }
+       }
+       /*stage ('Deploy') {
+           steps {
+               script{
+                   def image_id = registry + ":$BUILD_NUMBER"
+                   sh "ansible-playbook  playbook.yml --extra-vars \"image_id=${image_id}\""
+               }
+           }
+       }*/
    }
 }
