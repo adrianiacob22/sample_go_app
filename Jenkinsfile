@@ -1,8 +1,9 @@
 pipeline {
    agent any
    environment {
-       registry = "magalixcorp/k8scicd"
+       registry = "docker-repo"
        GOCACHE = "/tmp"
+       GOPATH = "${WORKSPACE}"
    }
    stages {
        stage('Build') {
@@ -13,15 +14,8 @@ pipeline {
         kind: Pod
         spec:
         containers:
-        - name: jnlp
-          image: nexus.local.net:8123/jenkins-jnlp-slave:20200420
-          env:
-          - name: CONTAINER_ENV_VAR
-            value: jnlp
         - name: golang
           image: golang
-        imagePullSecrets:
-        - name: docker-repo
         '''
            }
            }
@@ -43,15 +37,8 @@ pipeline {
         kind: Pod
         spec:
         containers:
-        - name: jnlp
-          image: nexus.local.net:8123/jenkins-jnlp-slave:20200420
-          env:
-          - name: CONTAINER_ENV_VAR
-            value: jnlp
         - name: golang
           image: golang
-        imagePullSecrets:
-        - name: docker-repo
         '''
            }
            }
