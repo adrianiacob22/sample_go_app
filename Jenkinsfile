@@ -1,5 +1,9 @@
 pipeline {
-   agent none
+   agent  {
+      node {
+            label 'docker'
+      }
+   }
    environment {
        registry = "nexus.local.net:8123"
        GOCACHE = "/tmp"
