@@ -1,5 +1,5 @@
 pipeline {
-   agent any
+   agent w540
    environment {
        registry = "nexus.local.net:8123"
        GOCACHE = "/tmp"
