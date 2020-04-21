@@ -5,7 +5,7 @@ pipeline {
       }
    }
    environment {
-       registry = "nexus.local.net:8123"
+       registry = "nexus.local.net:8123" 
        GOCACHE = "/tmp"
    }
    stages {
