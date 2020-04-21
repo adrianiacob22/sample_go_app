@@ -1,21 +1,21 @@
 podTemplate(yaml: '''
-        apiVersion: v1
-        kind: Pod
-        spec:
-        containers:
-        - name: jnlp
-          image: nexus.local.net:8123/jenkins-jnlp-slave:20200420
-          env:
-          - name: CONTAINER_ENV_VAR
-            value: jnlp
-        - name: golang
-          image: golang
-          command:
-          - sleep
-          args:
-          - infinity
-        imagePullSecrets:
-        - name: docker-repo
+apiVersion: v1
+kind: Pod
+spec:
+containers:
+- name: jnlp
+  image: nexus.local.net:8123/jenkins-jnlp-slave:20200420
+  env:
+  - name: CONTAINER_ENV_VAR
+    value: jnlp
+- name: golang
+  image: golang
+  command:
+  - sleep
+  args:
+  - infinity
+imagePullSecrets:
+- name: docker-repo
 ''')
     node(POD_LABEL) {
       container('golang'){
