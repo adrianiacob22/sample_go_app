@@ -5,32 +5,31 @@ pipeline {
       }
    }
    environment {
-       registry = "nexus.local.net:8123" 
+       registry = "nexus.local.net:8123"
        GOCACHE = "/tmp"
    }
    stages {
        stage('Build') {
-           agent {
-               docker {
-                   image 'golang'
+           node {
+               docker.withRegistry('nexus.local.net:8123') {
+                   docker.image('nexus.local.net:8123/golang:1').inside{
+                     // Create our project directory.
+                     sh '''echo ${GOPATH}
+                     echo ${GOCACHE}'''
+                     sh 'cd ${GOPATH}/src'
+                     sh 'mkdir -p ${GOPATH}/src/hello-world'
+                     // Copy all files in our Jenkins workspace to our project directory.
+                     sh 'cp -r ${WORKSPACE}/* ${GOPATH}/src/hello-world'
+                     // Build the app.
+                     sh 'go build'
+                   }
                }
-           }
-           steps {
-               // Create our project directory.
-               sh '''echo ${GOPATH}
-               echo ${GOCACHE}'''
-               sh 'cd ${GOPATH}/src'
-               sh 'mkdir -p ${GOPATH}/src/hello-world'
-               // Copy all files in our Jenkins workspace to our project directory.
-               sh 'cp -r ${WORKSPACE}/* ${GOPATH}/src/hello-world'
-               // Build the app.
-               sh 'go build'
            }
        }
        stage('Test') {
            agent {
                docker {
-                   image 'golang'
+                   image 'nexus.local.net:8123/golang:1'
                }
            }
            steps {
