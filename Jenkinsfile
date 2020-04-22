@@ -11,9 +11,7 @@ pipeline {
    stages {
        stage('Build') {
            agent {
-               docker {
-                   image 'nexus.local.net:8123/golang:1'
-               }
+               dockerfile true
            }
            steps {
                // Create our project directory.
@@ -29,9 +27,7 @@ pipeline {
        }
        stage('Test') {
            agent {
-               docker {
-                   image 'nexus.local.net:8123/golang:1'
-               }
+               dockerfile true
            }
            steps {
                // Create our project directory.
