@@ -5,3 +5,4 @@ Since we are building a CD pipeline, we should have some tests in place. Our cod
 
 The Dockerfile
 The Dockerfile is a multistage one to keep the image size as small as possible. It starts with a build image based on golang:alpine. The resulting binary is used in the second image, which is just a scratch one. A scratch image contains no dependencies or libraries, just the binary file that starts the application.
+https://www.magalix.com/blog/create-a-ci/cd-pipeline-with-kubernetes-and-jenkins
